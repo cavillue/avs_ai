@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Azure AI Search Interface</title>
+</head>
+<body>
+    <h1>Azure AI Search Query Interface</h1>
+    <form id="queryForm">
+        <label for="queryInput">Enter your question:</label>
+        <input type="text" id="queryInput" required>
+        <button type="submit">Search</button>
+    </form>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('queryForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const query = document.getElementById('queryInput').value;
+            fetch('/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query: query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = ''; // Clear previous results
+                if (data.results && data.results.length > 0) {
+                    data.results.forEach(result => {
+                        const resultDiv = document.createElement('div');
+                        resultDiv.textContent = result;
+                        resultsDiv.appendChild(resultDiv);
+                    });
+                } else {
+                    resultsDiv.textContent = 'No results found.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('results').textContent = 'Failed to retrieve results.';
+            });
+        });
+    </script>
+</body>
+</html>
